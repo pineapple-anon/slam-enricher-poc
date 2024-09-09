@@ -45,9 +45,9 @@ public class KafkaToParallelDbPipelineConfig {
                                 c.ackMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE))
                         .id("kafkaListener"))
                 .channel("processChannel")
-                .handle(messageProcessor::handleMessage)
-                .channel(c -> c.executor(taskExecutor1))
-                .split()
+                .handle(messageProcessor::processMsg)
+//                .channel(c -> c.executor(taskExecutor1))
+//                .split()
                 .channel("jdbcWriterChannel")
                 .get();
     }
