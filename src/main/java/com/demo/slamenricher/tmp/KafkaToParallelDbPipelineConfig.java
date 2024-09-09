@@ -46,34 +46,10 @@ public class KafkaToParallelDbPipelineConfig {
                         .id("kafkaListener"))
                 .channel("processChannel")
                 .handle(messageProcessor::handleMessage)
-                .publishSubscribeChannel(taskExecutor1, pubsub -> {
-                    for (int i = 0; i < 5; i++) {
-                        pubsub.subscribe(flow -> flow
-                                .channel(c -> c.executor(taskExecutor1))
-                                .handle(dbWriter::handleMessage)
-                                .handle(message -> new AckKafka().handleMessage(message)));
-                    }
-                })
+                .channel(c -> c.executor(taskExecutor1))
+                .split()
+                .channel("jdbcWriterChannel")
                 .get();
-    }
-
-    /*private Message<?> acknowledgeKafka(Message<?> message) {
-        Acknowledgment ack = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgment.class);
-        if (ack != null) {
-            ack.acknowledge();
-        }
-        return message;
-    }*/
-
-    private static class AckKafka implements MessageHandler {
-
-        @Override
-        public void handleMessage(Message<?> message) throws MessagingException {
-            Acknowledgment ack = message.getHeaders().get(KafkaHeaders.ACKNOWLEDGMENT, Acknowledgment.class);
-            if (ack != null) {
-                ack.acknowledge();
-            }
-        }
     }
 
     @Bean
