@@ -1,0 +1,13 @@
+package com.demo.slamenricher;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class SlamenricherApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
