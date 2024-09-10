@@ -1,0 +1,28 @@
+
+  683  git branch -m main
+  684  git branch
+  685  git config --global init.defaultBranch main
+  686  git config --global --list
+  687  git config user.name 'pineappleanon@pm.me'
+  688  git config user.name 'pineappleanon'
+  689  git config user.email 'pineappleanon@pm.me'
+  690  git clone git config --global init.defaultBranch
+  691  git clone https://github.com/pineapple-anon/slam-enricher-poc.git
+  692  git branch
+  693  git status
+  694  cd slam-enricher-poc/
+  695  git status
+  696  git branch
+  697  git checkout -b br01
+  698  echo $hostname
+  699  hostname
+  700  ll
+  701  touch papai-UM700.log
+  702  git add .
+  703  git commit -m "added a log file from host papai-UM700"
+  704  git checkout main
+  705  git merge br01
+  706  git push origin main
+  707  git status
+  708  history | tail -50
+
