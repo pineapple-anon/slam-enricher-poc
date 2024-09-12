@@ -1,6 +1,5 @@
 package com.demo.sample.cafe;
 
-import com.demo.sample.cafe.model.Delivery;
 import com.demo.sample.cafe.model.Drink;
 import com.demo.sample.cafe.model.DrinkType;
 import com.demo.sample.cafe.model.Order;
@@ -16,11 +15,11 @@ import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.Pollers;
 import org.springframework.integration.scheduling.PollerMetadata;
+import org.springframework.messaging.Message;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @SpringBootApplication               // 1
 @IntegrationComponentScan            // 2
@@ -44,7 +43,8 @@ public class CafeApplication {
 
     @MessagingGateway                                              // 7
     public interface Cafe {
-        @Gateway(requestChannel = "orders.input")            // 8
+        @Gateway(requestChannel = "orders.input")
+            // 8
         void placeOrder(Order order);                        // 9
     }
 
@@ -54,7 +54,7 @@ public class CafeApplication {
 
     @Bean(name = PollerMetadata.DEFAULT_POLLER)
     public PollerMetadata poller() {                               // 11
-        return Pollers.fixedDelay(1000).get();
+        return Pollers.fixedDelay(1000).getObject();
     }
 
     @Bean
@@ -63,7 +63,7 @@ public class CafeApplication {
                 .split(Order.class, Order::getItems)                      // 14
                 .channel(c -> c.executor(Executors.newCachedThreadPool()))// 15
                 .<OrderItem, Boolean>route(OrderItem::isIced, mapping -> mapping // 16
-                        .subFlowMapping("true", sf -> sf                        // 17
+                        .subFlowMapping(true, sf -> sf                        // 17
                                 .channel(c -> c.queue(10))                            // 18
                                 .publishSubscribeChannel(c -> c                       // 19
                                         .subscribe(s ->                                     // 20
@@ -76,7 +76,7 @@ public class CafeApplication {
                                                                 + " for order #" + item.getOrderNumber()
                                                                 + ": " + item)                                 // 23
                                                 .handle(m -> System.out.println(m.getPayload())))))// 24
-                        .subFlowMapping("false", sf -> sf                        // 25
+                        .subFlowMapping(false, sf -> sf                        // 25
                                 .channel(c -> c.queue(10))
                                 .publishSubscribeChannel(c -> c
                                         .subscribe(s ->
@@ -102,7 +102,15 @@ public class CafeApplication {
 //                                        .collect(Collectors.toList())))                     // 30
 //                        .correlationStrategy(m ->
 //                                ((Drink) m.getPayload()).getOrderNumber()), null)     // 31
-                .handle(CharacterStreamWritingMessageHandler.stdout());   // 32
+//                .handle(CharacterStreamWritingMessageHandler.stdout())                  // 32
+                .handle(this::handleMessage);
+    }
+
+    private void sleepUninterruptibly(int i, TimeUnit timeUnit) {
+    }
+
+    private void handleMessage(Message<?> message) {
+
     }
 
 }
